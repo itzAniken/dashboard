@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediBridge — Healthcare Cost Intelligence Platform</title>
+<meta name="description" content="Compare treatment costs across 15 hospitals in 8 Indian cities. Data-driven healthcare cost analysis for patients and providers.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #FAFAFA;
+    --surface:   #FFFFFF;
+    --surface-2: #F5F5F5;
+    --border:    #E8E8E8;
+    --border-2:  #D4D4D4;
+    --text:      #1A1A1A;
+    --text-2:    #404040;
+    --text-3:    #737373;
+    --text-4:    #A3A3A3;
+    --accent:    #18181B;
+    --accent-2:  #3F3F46;
+    --green:     #16A34A;
+    --green-bg:  #F0FDF4;
+    --red:       #DC2626;
+    --red-bg:    #FEF2F2;
+    --amber:     #CA8A04;
+    --amber-bg:  #FEFCE8;
+    --blue:      #2563EB;
+    --blue-bg:   #EFF6FF;
+    --font:      'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono:      'JetBrains Mono', 'Menlo', monospace;
+    --radius:    6px;
+    --shadow:    0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+    --transition: 0.2s ease;
+  }
+
+  [data-theme="dark"] {
+    --bg:        #0A0A0A;
+    --surface:   #141414;
+    --surface-2: #1C1C1C;
+    --border:    #262626;
+    --border-2:  #333333;
+    --text:      #FAFAFA;
+    --text-2:    #D4D4D4;
+    --text-3:    #A3A3A3;
+    --text-4:    #525252;
+    --accent:    #FAFAFA;
+    --accent-2:  #D4D4D8;
+    --green-bg:  #052E16;
+    --red-bg:    #450A0A;
+    --amber-bg:  #422006;
+    --blue-bg:   #172554;
+    --shadow:    0 1px 2px rgba(0,0,0,0.2);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .logo {
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none; color: var(--text);
+  }
+  .logo-mark {
+    width: 26px; height: 26px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-mark svg { width: 14px; height: 14px; }
+  .logo-text { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+  .logo-divider { width: 1px; height: 20px; background: var(--border); }
+
+  .topbar-search {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: border-color var(--transition);
+    min-width: 200px;
+  }
+  .topbar-search:hover { border-color: var(--border-2); }
+  .topbar-search svg { width: 14px; height: 14px; color: var(--text-4); flex-shrink: 0; }
+  .topbar-search span { font-size: 12px; color: var(--text-4); flex: 1; }
+  .topbar-search kbd {
+    font-size: 10px; font-family: var(--font);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1px 5px; border-radius: 3px;
+    color: var(--text-4); font-weight: 500;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 6px; }
+  .topbar-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    color: var(--text-3);
+    transition: all var(--transition);
+  }
+  .topbar-btn:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-2); }
+  .topbar-btn svg { width: 15px; height: 15px; }
+  .topbar-pill {
+    font-size: 11px; color: var(--text-3);
+    padding: 4px 10px; border-radius: 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .topbar-pill .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .topbar-time { font-size: 11px; color: var(--text-4); font-family: var(--mono); font-weight: 400; }
+
+  /* ── NAV ── */
+  .nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    overflow-x: auto;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-item {
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 450;
+    color: var(--text-3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all var(--transition);
+    white-space: nowrap;
+    user-select: none;
+    position: relative;
+  }
+  .nav-item:hover { color: var(--text); }
+  .nav-item.active { color: var(--text); font-weight: 550; border-bottom-color: var(--accent); }
+  .nav-count {
+    font-size: 9px; font-weight: 600;
+    background: var(--surface-2);
+    color: var(--text-4);
+    padding: 1px 5px; border-radius: 10px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .nav-item.active .nav-count { background: var(--accent); color: var(--bg); }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .toolbar-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .toolbar-right { display: flex; align-items: center; gap: 8px; }
+  .filter-chip {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 5px 10px;
+    font-size: 12px; font-family: var(--font);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all var(--transition);
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .filter-chip:hover, .filter-chip:focus { border-color: var(--accent); }
+  .filter-chip svg { width: 12px; height: 12px; color: var(--text-4); }
+  .btn-sm {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 5px 12px;
+    font-size: 12px; font-family: var(--font);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+  .btn-sm:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-2); }
+  .btn-sm svg { width: 12px; height: 12px; }
+  .btn-sm.danger:hover { color: var(--red); border-color: var(--red); background: var(--red-bg); }
+
+  /* ── MAIN LAYOUT ── */
+  .main { padding: 0 24px 40px; max-width: 1320px; margin: 0 auto; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── STATS ROW ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .stat-cell {
+    background: var(--surface);
+    padding: 20px 22px;
+    position: relative;
+  }
+  .stat-cell:first-child { border-radius: 7px 0 0 7px; }
+  .stat-cell:last-child { border-radius: 0 7px 7px 0; }
+  .stat-eyebrow {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--text-4);
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-size: 26px; font-weight: 700;
+    font-family: var(--mono);
+    letter-spacing: -1px;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-desc {
+    font-size: 12px;
+    color: var(--text-3);
+  }
+  .stat-trend {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 11px; font-weight: 500;
+    padding: 2px 6px; border-radius: 4px;
+    margin-top: 6px;
+  }
+  .stat-trend.up { background: var(--green-bg); color: var(--green); }
+  .stat-trend.down { background: var(--red-bg); color: var(--red); }
+  .stat-trend.neutral { background: var(--surface-2); color: var(--text-3); }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 16px 20px 14px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .card-desc { font-size: 11px; color: var(--text-4); margin-top: 2px; }
+  .card-body { padding: 16px 20px; }
+  .card-tag {
+    font-size: 10px; font-weight: 500;
+    padding: 3px 8px; border-radius: 4px;
+    background: var(--surface-2);
+    color: var(--text-3);
+    white-space: nowrap;
+  }
+
+  /* ── GRID LAYOUTS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-23 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .full { margin-bottom: 16px; }
+
+  /* ── HORIZONTAL BAR ── */
+  .hbar { display: flex; flex-direction: column; gap: 6px; }
+  .hbar-row { display: flex; align-items: center; gap: 10px; }
+  .hbar-rank {
+    font-size: 10px; font-family: var(--mono); color: var(--text-4);
+    min-width: 18px; text-align: right; font-weight: 500;
+  }
+  .hbar-name {
+    font-size: 12px; color: var(--text-2);
+    min-width: 145px; text-align: right;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .hbar-track {
+    flex: 1; height: 24px;
+    background: var(--surface-2);
+    border-radius: 4px;
+    overflow: hidden; position: relative;
+  }
+  .hbar-fill {
+    height: 100%; border-radius: 4px;
+    position: absolute; left: 0; top: 0;
+    display: flex; align-items: center; padding-left: 8px;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hbar-fill-text {
+    font-size: 10px; font-family: var(--mono); font-weight: 500;
+    color: white; white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  }
+  .hbar-val {
+    font-size: 11px; font-family: var(--mono); color: var(--text-3);
+    min-width: 70px;
+  }
+
+  /* ── TABLE ── */
+  .tbl { width: 100%; border-collapse: collapse; }
+  .tbl th {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-4);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+    position: sticky; top: 0;
+  }
+  .tbl td {
+    font-size: 12px; padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-2);
+  }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl tbody tr { transition: background var(--transition); }
+  .tbl tbody tr:hover td { background: var(--surface-2); }
+  .rank-dot {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 50%;
+    font-size: 10px; font-weight: 700; font-family: var(--mono);
+  }
+  .rank-1 { background: #FEF3C7; color: #92400E; }
+  .rank-2 { background: #F1F5F9; color: #475569; }
+  .rank-3 { background: #FED7AA; color: #9A3412; }
+  .rank-n { background: var(--surface-2); color: var(--text-4); }
+  .pill {
+    display: inline-block; font-family: var(--mono);
+    font-size: 11px; font-weight: 500;
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .pill-green { background: var(--green-bg); color: var(--green); }
+  .pill-red { background: var(--red-bg); color: var(--red); }
+  .pill-amber { background: var(--amber-bg); color: var(--amber); }
+  .pill-blue { background: var(--blue-bg); color: var(--blue); }
+  .cat-label {
+    font-size: 10px; font-weight: 500;
+    padding: 2px 7px; border-radius: 3px;
+    background: var(--surface-2); color: var(--text-3);
+  }
+
+  /* ── DONUT ── */
+  .donut-container { display: flex; align-items: center; gap: 24px; }
+  .donut-legend { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+  .legend-row { display: flex; align-items: center; gap: 8px; }
+  .legend-swatch { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .legend-label { font-size: 11px; color: var(--text-2); flex: 1; }
+  .legend-value { font-size: 11px; font-family: var(--mono); color: var(--text-3); }
+
+  /* ── VARIANCE ── */
+  .var-item { margin-bottom: 10px; }
+  .var-header { display: flex; justify-content: space-between; margin-bottom: 3px; }
+  .var-name { font-size: 11px; color: var(--text-2); }
+  .var-pct { font-size: 10px; font-family: var(--mono); color: var(--amber); font-weight: 600; }
+  .var-track { height: 10px; background: var(--surface-2); border-radius: 3px; position: relative; overflow: hidden; }
+  .var-base { position: absolute; height: 100%; background: var(--green); opacity: 0.5; border-radius: 3px 0 0 3px; }
+  .var-spread { position: absolute; height: 100%; background: var(--red); opacity: 0.4; }
+
+  /* ── CITY CARDS ── */
+  .city-tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    transition: box-shadow var(--transition), border-color var(--transition);
+  }
+  .city-tile:hover { box-shadow: var(--shadow-md); border-color: var(--border-2); }
+  .city-tile-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .city-tile-state { font-size: 11px; color: var(--text-4); margin-bottom: 10px; }
+  .city-tile-cost { font-size: 22px; font-weight: 700; font-family: var(--mono); letter-spacing: -0.5px; margin-bottom: 8px; }
+  .city-tile-bar { height: 3px; border-radius: 2px; transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+  .city-tile-meta { display: flex; gap: 12px; margin-top: 10px; }
+  .city-tile-meta span { font-size: 10px; color: var(--text-4); }
+  .city-tile-meta strong { font-weight: 600; color: var(--text-3); }
+
+  /* ── SQL CODE ── */
+  .code-block {
+    background: #18181B; border-radius: 8px;
+    padding: 18px 20px;
+    font-family: var(--mono); font-size: 12px;
+    color: #A1A1AA; line-height: 1.8;
+    overflow-x: auto; margin-top: 8px;
+    border: 1px solid #27272A;
+  }
+  [data-theme="dark"] .code-block { background: #09090B; border-color: #1C1C1E; }
+  .kw  { color: #60A5FA; font-weight: 500; }
+  .fn  { color: #FB923C; }
+  .str { color: #C084FC; }
+  .cmt { color: #3F3F46; font-style: italic; }
+  .num { color: #F87171; }
+
+  /* ── SCHEMA ── */
+  .schema-wrap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .schema-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+  }
+  .schema-head {
+    background: var(--accent);
+    padding: 10px 16px;
+    font-size: 12px; font-weight: 600; color: var(--bg);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .schema-row {
+    padding: 8px 16px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    transition: background var(--transition);
+  }
+  .schema-row:hover { background: var(--surface-2); }
+  .schema-col { font-size: 11px; font-family: var(--mono); color: var(--text-2); }
+  .schema-type { font-size: 10px; font-family: var(--mono); color: var(--text-4); }
+  .schema-pk { color: var(--amber); font-size: 10px; font-weight: 700; }
+  .schema-fk { color: var(--blue); font-size: 10px; font-weight: 700; }
+
+  /* ── INSIGHTS ── */
+  .insights-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .insight {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    transition: box-shadow var(--transition), border-color var(--transition);
+  }
+  .insight:hover { box-shadow: var(--shadow-md); border-color: var(--border-2); }
+  .insight-idx { font-size: 10px; font-family: var(--mono); color: var(--text-4); font-weight: 500; margin-bottom: 6px; }
+  .insight-heading { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; line-height: 1.4; }
+  .insight-text { font-size: 12px; color: var(--text-3); line-height: 1.65; }
+  .insight-text em { font-style: normal; font-weight: 600; color: var(--amber); font-family: var(--mono); font-size: 11px; }
+
+  /* ── PIPELINE ── */
+  .pipeline {
+    display: flex; align-items: stretch; gap: 0;
+    background: var(--surface-2); border-radius: 8px;
+    overflow: hidden; border: 1px solid var(--border);
+  }
+  .pipe-step {
+    flex: 1; padding: 16px 18px;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .pipe-step:last-child { border-right: none; }
+  .pipe-step.completed { background: var(--surface); }
+  .pipe-step.final { background: var(--accent); color: var(--bg); }
+  .pipe-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; opacity: 0.6; }
+  .pipe-val { font-size: 20px; font-weight: 700; font-family: var(--mono); letter-spacing: -0.5px; margin-top: 4px; }
+  .pipe-note { font-size: 10px; opacity: 0.5; margin-top: 2px; }
+  .pipe-step.final .pipe-label { color: var(--bg); }
+  .pipe-step.final .pipe-val { color: var(--bg); }
+  .pipe-step.final .pipe-note { color: var(--bg); }
+  .pipe-arrow {
+    position: absolute; right: -8px; top: 50%; transform: translateY(-50%);
+    z-index: 2; font-size: 12px; color: var(--text-4);
+    width: 16px; height: 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pipe-step.final .pipe-arrow { display: none; }
+
+  /* ── TAG CHIPS ── */
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .tag {
+    font-size: 11px; padding: 3px 10px; border-radius: 20px;
+    font-weight: 500; border: 1px solid;
+    cursor: pointer; transition: all var(--transition);
+    user-select: none;
+  }
+  .tag:hover { opacity: 0.8; }
+  .tag-dark { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .tag-outline { background: transparent; color: var(--text-3); border-color: var(--border); }
+  .tag-outline:hover { border-color: var(--accent); color: var(--text); }
+  .tag-outline.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .sql-card-hidden { display: none !important; }
+  .schema-row.highlight { background: var(--amber-bg); }
+  .schema-row.highlight .schema-col { color: var(--text); font-weight: 600; }
+  .schema-row.dimmed { opacity: 0.35; }
+
+  /* ── SECTION HEADER ── */
+  .sec-head {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px; margin-top: 4px;
+  }
+  .sec-line { flex: 1; height: 1px; background: var(--border); }
+  .sec-title {
+    font-size: 11px; font-weight: 600; color: var(--text-4);
+    text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap;
+  }
+
+  /* ── COMPARE MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 500;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 80px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 580px; max-height: 70vh;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    overflow: hidden;
+    animation: modal-in 0.2s ease;
+  }
+  @keyframes modal-in { from { opacity: 0; transform: translateY(-10px) scale(0.98); } }
+  .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-header h3 { font-size: 14px; font-weight: 600; }
+  .modal-close {
+    width: 28px; height: 28px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--surface);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--text-3); transition: all var(--transition);
+  }
+  .modal-close:hover { background: var(--surface-2); color: var(--text); }
+  .modal-body { padding: 20px; overflow-y: auto; max-height: 55vh; }
+  .modal-search-input {
+    width: 100%; padding: 10px 14px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface-2); color: var(--text);
+    font-size: 14px; font-family: var(--font);
+    outline: none; transition: border-color var(--transition);
+  }
+  .modal-search-input:focus { border-color: var(--accent); }
+  .search-results { margin-top: 12px; }
+  .search-result-item {
+    padding: 10px 12px; border-radius: 6px;
+    cursor: pointer; transition: background var(--transition);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .search-result-item:hover { background: var(--surface-2); }
+  .search-result-item .sr-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .search-result-item .sr-meta { font-size: 11px; color: var(--text-4); }
+  .search-result-item .sr-cost { font-size: 12px; font-family: var(--mono); color: var(--text-3); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-4); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--accent);
+    color: var(--bg);
+    padding: 10px 18px; border-radius: 8px;
+    font-size: 13px; font-weight: 500;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    z-index: 600;
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .grid-2, .grid-23 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .schema-wrap { grid-template-columns: 1fr; }
+    .main { padding: 0 16px 40px; }
+    .topbar, .nav, .toolbar { padding-left: 16px; padding-right: 16px; }
+    .topbar-search { display: none; }
+  }
+  @media (max-width: 600px) {
+    .stats-row { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .pipeline { flex-direction: column; }
+    .pipe-step { border-right: none; border-bottom: 1px solid var(--border); }
+    .pipe-arrow { right: 50%; top: auto; bottom: -8px; transform: translateX(50%) rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<!-- SEARCH MODAL -->
+<div class="modal-overlay" id="searchModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Search treatments & hospitals</h3>
+      <button class="modal-close" onclick="closeSearch()" aria-label="Close search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="text" class="modal-search-input" id="searchInput" placeholder="Type to search treatments, hospitals, cities..." oninput="handleSearch(this.value)" autocomplete="off">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <a class="logo" href="#">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 4v16M4 12h16"/></svg>
+      </div>
+      <span class="logo-text">MediBridge</span>
+    </a>
+    <div class="logo-divider"></div>
+    <div class="topbar-search" onclick="openSearch()" id="searchTrigger">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+      <span>Search treatments...</span>
+      <kbd>Ctrl K</kbd>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-time" id="liveClock"></span>
+    <div class="topbar-pill"><div class="dot"></div> 1,183 records</div>
+    <button class="topbar-btn" onclick="toggleTheme()" title="Toggle dark mode" id="themeToggle" aria-label="Toggle dark mode">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+    <button class="topbar-btn" onclick="exportData()" title="Export CSV" aria-label="Export data">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <div class="nav-item active" onclick="go('overview',this)">Overview</div>
+  <div class="nav-item" onclick="go('hospitals',this)">Hospitals <span class="nav-count">15</span></div>
+  <div class="nav-item" onclick="go('treatments',this)">Treatments <span class="nav-count">40</span></div>
+  <div class="nav-item" onclick="go('compare',this)">Compare</div>
+  <div class="nav-item" onclick="go('cities',this)">Cities <span class="nav-count">8</span></div>
+  <div class="nav-item" onclick="go('sql',this)">SQL</div>
+  <div class="nav-item" onclick="go('schema',this)">Schema</div>
+  <div class="nav-item" onclick="go('insights',this)">Insights <span class="nav-count">12</span></div>
+</nav>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="toolbar-left">
+    <select class="filter-chip" id="fHosp" onchange="applyFilters()">
+      <option value="">All Hospitals</option>
+      <option>Apollo Hospitals</option><option>Fortis Healthcare</option>
+      <option>Max Super Speciality</option><option>Manipal Hospitals</option>
+      <option>Narayana Health</option><option>AIIMS Delhi</option>
+      <option>Kokilaben Dhirubhai</option><option>Medanta The Medicity</option>
+      <option>Ruby Hall Clinic</option><option>Aster CMI Hospital</option>
+      <option>Christian Medical College</option><option>Sankara Nethralaya</option>
+      <option>KIMS Hospitals</option><option>Yashoda Hospitals</option>
+      <option>Global Hospitals</option>
+    </select>
+    <select class="filter-chip" id="fCity" onchange="applyFilters()">
+      <option value="">All Cities</option>
+      <option>Mumbai</option><option>Delhi</option><option>Bangalore</option>
+      <option>Gurgaon</option><option>Pune</option><option>Vellore</option>
+      <option>Chennai</option><option>Hyderabad</option>
+    </select>
+    <select class="filter-chip" id="fCat" onchange="applyFilters()">
+      <option value="">All Categories</option>
+      <option>Cardiac Surgery</option><option>Orthopaedics</option>
+      <option>Oncology</option><option>Transplant</option>
+      <option>Diagnostics</option><option>Maternity</option>
+      <option>Neurology</option><option>General Surgery</option>
+      <option>Ophthalmology</option><option>Nephrology</option>
+      <option>Dental</option><option>Gastroenterology</option>
+      <option>Rehabilitation</option><option>Pulmonology</option>
+      <option>Plastic Surgery</option><option>Endocrinology</option>
+    </select>
+  </div>
+  <div class="toolbar-right">
+    <button class="btn-sm danger" onclick="resetFilters()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+      Reset
+    </button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ═══ OVERVIEW ═══ -->
+<div class="page active" id="page-overview">
+
+  <div class="stats-row">
+    <div class="stat-cell">
+      <div class="stat-eyebrow">Hospitals Covered</div>
+      <div class="stat-value">15</div>
+      <div class="stat-desc">Across 8 cities in India</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-eyebrow">Treatments Tracked</div>
+      <div class="stat-value">40</div>
+      <div class="stat-desc">16 speciality categories</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-eyebrow">Avg Treatment Cost</div>
+      <div class="stat-value">₹2.42L</div>
+      <div class="stat-desc">Median ₹1,04,000</div>
+      <div class="stat-trend neutral">Per procedure average</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-eyebrow">Savings Opportunity</div>
+      <div class="stat-value">₹86.5L</div>
+      <div class="stat-desc">If optimal hospitals chosen</div>
+      <div class="stat-trend up">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+        Actionable
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-23">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Hospital cost comparison</div><div class="card-desc">Average treatment cost per hospital, sorted low → high</div></div>
+        <span class="card-tag">Top 10</span>
+      </div>
+      <div class="card-body">
+        <div class="hbar" id="overviewHospBar"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Category breakdown</div><div class="card-desc">Cost distribution by speciality</div></div>
+      </div>
+      <div class="card-body" id="overviewDonut"></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Cost distribution</div><div class="card-desc">Treatment count by cost bucket</div></div>
+      </div>
+      <div class="card-body" id="overviewHist"></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Cost extremes</div><div class="card-desc">Cheapest vs most expensive</div></div>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;gap:16px;">
+          <div style="flex:1;background:var(--green-bg);border-radius:8px;padding:16px;">
+            <div style="font-size:10px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:0.5px;">Lowest cost</div>
+            <div style="font-size:24px;font-weight:700;font-family:var(--mono);color:var(--green);margin-top:6px;">₹432</div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:4px;">ECG Procedure</div>
+          </div>
+          <div style="flex:1;background:var(--red-bg);border-radius:8px;padding:16px;">
+            <div style="font-size:10px;font-weight:600;color:var(--red);text-transform:uppercase;letter-spacing:0.5px;">Highest cost</div>
+            <div style="font-size:24px;font-weight:700;font-family:var(--mono);color:var(--red);margin-top:6px;">₹26.65L</div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:4px;">Heart Transplant</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding:12px;background:var(--surface-2);border-radius:6px;">
+          <div style="font-size:11px;color:var(--text-3);">This is a <strong style="color:var(--text);font-weight:600;">6,168×</strong> range between the cheapest and most expensive treatments in the dataset.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="full">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Data pipeline</div><div class="card-desc">Records processed at each validation stage</div></div>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <div class="pipeline">
+          <div class="pipe-step">
+            <div class="pipe-label">Raw Import</div>
+            <div class="pipe-val">1,258</div>
+            <div class="pipe-note">Initial dataset</div>
+            <div class="pipe-arrow">→</div>
+          </div>
+          <div class="pipe-step completed">
+            <div class="pipe-label">Dedup</div>
+            <div class="pipe-val">1,201</div>
+            <div class="pipe-note">−57 duplicates</div>
+            <div class="pipe-arrow">→</div>
+          </div>
+          <div class="pipe-step completed">
+            <div class="pipe-label">Nulls Removed</div>
+            <div class="pipe-val">1,189</div>
+            <div class="pipe-note">−12 null costs</div>
+            <div class="pipe-arrow">→</div>
+          </div>
+          <div class="pipe-step completed">
+            <div class="pipe-label">Validated</div>
+            <div class="pipe-val">1,183</div>
+            <div class="pipe-note">−6 invalid values</div>
+            <div class="pipe-arrow">→</div>
+          </div>
+          <div class="pipe-step final">
+            <div class="pipe-label">Quality Score</div>
+            <div class="pipe-val">94.0%</div>
+            <div class="pipe-note">Clean dataset</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ HOSPITALS ═══ -->
+<div class="page" id="page-hospitals">
+  <div class="sec-head"><div class="sec-line"></div><div class="sec-title">Hospital Performance</div><div class="sec-line"></div></div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Most affordable</div><div class="card-desc">Ranked by average treatment cost</div></div>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table class="tbl"><thead><tr><th>#</th><th>Hospital</th><th>City</th><th>Avg Cost</th></tr></thead>
+        <tbody id="tblAffordable"></tbody></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Most expensive</div><div class="card-desc">Ranked by average treatment cost</div></div>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table class="tbl"><thead><tr><th>#</th><th>Hospital</th><th>City</th><th>Avg Cost</th></tr></thead>
+        <tbody id="tblExpensive"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <div class="full">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">All hospitals — full comparison</div><div class="card-desc">15 hospitals sorted by average treatment cost</div></div>
+        <button class="btn-sm" onclick="exportData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Export</button>
+      </div>
+      <div class="card-body"><div class="hbar" id="hospFullBar"></div></div>
+    </div>
+  </div>
+
+  <div class="full">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Cheapest vs most expensive provider</div><div class="card-desc">Best-value and highest-cost provider for key procedures</div></div>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table class="tbl"><thead><tr><th>Treatment</th><th>Category</th><th>Cheapest</th><th>Most Expensive</th><th>Savings</th></tr></thead>
+        <tbody id="tblCheapExp"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TREATMENTS ═══ -->
+<div class="page" id="page-treatments">
+  <div class="sec-head"><div class="sec-line"></div><div class="sec-title">Treatment Cost Intelligence</div><div class="sec-line"></div></div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Top 10 most expensive</div><div class="card-desc">Maximum recorded cost per procedure</div></div>
+      </div>
+      <div class="card-body"><div class="hbar" id="expTreatBar"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Price variance by treatment</div><div class="card-desc">Cost spread across hospitals</div></div>
+      </div>
+      <div class="card-body" id="varianceChart"></div>
+    </div>
+  </div>
+
+  <div class="full">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">All 40 treatments — cost ranking</div><div class="card-desc">Sorted by mean cost across all hospitals</div></div>
+      </div>
+      <div class="card-body" style="padding:0;max-height:520px;overflow-y:auto;">
+        <table class="tbl"><thead><tr><th>#</th><th>Treatment</th><th>Category</th><th>Avg Cost</th><th>Range</th><th>Hospitals</th></tr></thead>
+        <tbody id="tblTreatments"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ COMPARE ═══ -->
+<div class="page" id="page-compare">
+  <div class="sec-head"><div class="sec-line"></div><div class="sec-title">Hospital Comparison Tool</div><div class="sec-line"></div></div>
+
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div>
+      <label style="font-size:11px;font-weight:600;color:var(--text-4);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Hospital A</label>
+      <select class="filter-chip" id="cmpA" onchange="renderCompare()" style="width:100%;">
+        <option value="">Select hospital...</option>
+      </select>
+    </div>
+    <div>
+      <label style="font-size:11px;font-weight:600;color:var(--text-4);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Hospital B</label>
+      <select class="filter-chip" id="cmpB" onchange="renderCompare()" style="width:100%;">
+        <option value="">Select hospital...</option>
+      </select>
+    </div>
+  </div>
+  <div id="compareResult"></div>
+</div>
+
+<!-- ═══ CITIES ═══ -->
+<div class="page" id="page-cities">
+  <div class="sec-head"><div class="sec-line"></div><div class="sec-title">City-wise Analysis</div><div class="sec-line"></div></div>
+  <div class="grid-3" style="grid-template-columns:repeat(4,1fr);" id="cityGrid"></div>
+
+  <div class="full">
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">City cost comparison</div><div class="card-desc">Average healthcare cost per city</div></div></div>
+      <div class="card-body"><div class="hbar" id="cityBarChart"></div></div>
+    </div>
+  </div>
+
+  <div class="full">
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">City summary</div><div class="card-desc">Hospitals, records, and cost statistics</div></div></div>
+      <div class="card-body" style="padding:0;">
+        <table class="tbl"><thead><tr><th>#</th><th>City</th><th>State</th><th>Avg Cost</th><th>Min</th><th>Max</th><th>Hospitals</th><th>Records</th></tr></thead>
+        <tbody id="tblCity"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SQL ═══ -->
+<div class="page" id="page-sql">
+  <div class="sec-head"><div class="sec-line"></div><div class="sec-title">SQL Analysis Scripts</div><div class="sec-line"></div></div>
+  <div class="tags" id="sqlTags">
+    <span class="tag tag-dark">MySQL 8.0</span>
+    <span class="tag tag-outline" data-filter="window" onclick="filterSQL(this,'window')">Window Functions</span>
+    <span class="tag tag-outline" data-filter="cte" onclick="filterSQL(this,'cte')">CTEs</span>
+    <span class="tag tag-outline" data-filter="aggregate" onclick="filterSQL(this,'aggregate')">Aggregate Functions</span>
+    <span class="tag tag-outline" data-filter="cleaning" onclick="filterSQL(this,'cleaning')">Data Cleaning</span>
+  </div>
+
+  <div class="full sql-card" data-tags="aggregate"><div class="card">
+    <div class="card-head"><div><div class="card-title">Average treatment cost by hospital</div><div class="card-desc">Ranks hospitals from most affordable to most expensive</div></div>
+    <button class="btn-sm" onclick="copySQL(0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button></div>
+    <div class="card-body"><div class="code-block" id="sql0"><span class="cmt">-- Average treatment cost per hospital</span>
+<span class="kw">SELECT</span>
+    h.hospital_name, h.city, h.state,
+    <span class="fn">ROUND</span>(<span class="fn">AVG</span>(tc.cost), <span class="num">0</span>) <span class="kw">AS</span> avg_cost,
+    <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total_records
+<span class="kw">FROM</span> hospitals h
+<span class="kw">JOIN</span> treatment_costs tc <span class="kw">ON</span> h.hospital_id = tc.hospital_id
+<span class="kw">GROUP BY</span> h.hospital_id, h.hospital_name, h.city, h.state
+<span class="kw">ORDER BY</span> avg_cost <span class="kw">ASC</span>;</div></div>
+  </div></div>
+
+  <div class="full sql-card" data-tags="cte window"><div class="card">
+    <div class="card-head"><div><div class="card-title">Cheapest hospital per treatment (CTE + RANK)</div><div class="card-desc">Uses RANK() window function to identify best-value provider</div></div>
+    <button class="btn-sm" onclick="copySQL(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button></div>
+    <div class="card-body"><div class="code-block" id="sql1"><span class="cmt">-- Cheapest hospital for each treatment</span>
+<span class="kw">WITH</span> ranked_hospitals <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        t.treatment_name, t.treatment_category,
+        h.hospital_name, h.city,
+        <span class="fn">ROUND</span>(<span class="fn">AVG</span>(tc.cost), <span class="num">0</span>) <span class="kw">AS</span> avg_cost,
+        <span class="fn">RANK</span>() <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> t.treatment_id
+            <span class="kw">ORDER BY</span> <span class="fn">AVG</span>(tc.cost) <span class="kw">ASC</span>
+        ) <span class="kw">AS</span> cost_rank
+    <span class="kw">FROM</span> treatment_costs tc
+    <span class="kw">JOIN</span> hospitals h   <span class="kw">ON</span> tc.hospital_id  = h.hospital_id
+    <span class="kw">JOIN</span> treatments t  <span class="kw">ON</span> tc.treatment_id = t.treatment_id
+    <span class="kw">GROUP BY</span> t.treatment_id, h.hospital_id
+)
+<span class="kw">SELECT</span> treatment_name, treatment_category, hospital_name, city, avg_cost
+<span class="kw">FROM</span> ranked_hospitals
+<span class="kw">WHERE</span> cost_rank = <span class="num">1</span>
+<span class="kw">ORDER BY</span> avg_cost <span class="kw">DESC</span>;</div></div>
+  </div></div>
+
+  <div class="full sql-card" data-tags="aggregate"><div class="card">
+    <div class="card-head"><div><div class="card-title">Cost variance between hospitals</div><div class="card-desc">Identifies treatments with highest price spread</div></div>
+    <button class="btn-sm" onclick="copySQL(2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button></div>
+    <div class="card-body"><div class="code-block" id="sql2"><span class="cmt">-- Cost variance per treatment</span>
+<span class="kw">SELECT</span>
+    t.treatment_name, t.treatment_category,
+    <span class="fn">MIN</span>(tc.cost) <span class="kw">AS</span> min_cost,
+    <span class="fn">MAX</span>(tc.cost) <span class="kw">AS</span> max_cost,
+    (<span class="fn">MAX</span>(tc.cost) - <span class="fn">MIN</span>(tc.cost)) <span class="kw">AS</span> cost_variance,
+    <span class="fn">ROUND</span>((<span class="fn">MAX</span>(tc.cost) - <span class="fn">MIN</span>(tc.cost)) / <span class="fn">MIN</span>(tc.cost) * <span class="num">100</span>, <span class="num">1</span>) <span class="kw">AS</span> variance_pct,
+    <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> tc.hospital_id) <span class="kw">AS</span> num_hospitals
+<span class="kw">FROM</span> treatment_costs tc
+<span class="kw">JOIN</span> treatments t <span class="kw">ON</span> tc.treatment_id = t.treatment_id
+<span class="kw">GROUP BY</span> t.treatment_id, t.treatment_name, t.treatment_category
+<span class="kw">ORDER BY</span> cost_variance <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="num">10</span>;</div></div>
+  </div></div>
+
+  <div class="full sql-card" data-tags="aggregate"><div class="card">
+    <div class="card-head"><div><div class="card-title">Treatment category analysis</div><div class="card-desc">Speciality-level cost metrics</div></div>
+    <button class="btn-sm" onclick="copySQL(3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button></div>
+    <div class="card-body"><div class="code-block" id="sql3"><span class="cmt">-- Category-level cost analysis</span>
+<span class="kw">SELECT</span>
+    t.treatment_category,
+    <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> t.treatment_id) <span class="kw">AS</span> treatment_count,
+    <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total_records,
+    <span class="fn">ROUND</span>(<span class="fn">AVG</span>(tc.cost), <span class="num">0</span>) <span class="kw">AS</span> avg_cost,
+    <span class="fn">MIN</span>(tc.cost) <span class="kw">AS</span> min_cost,
+    <span class="fn">MAX</span>(tc.cost) <span class="kw">AS</span> max_cost,
+    <span class="fn">ROUND</span>(<span class="fn">STDDEV</span>(tc.cost), <span class="num">0</span>) <span class="kw">AS</span> cost_stddev
+<span class="kw">FROM</span> treatment_costs tc
+<span class="kw">JOIN</span> treatments t <span class="kw">ON</span> tc.treatment_id = t.treatment_id
+<span class="kw">GROUP BY</span> t.treatment_category
+<span class="kw">ORDER BY</span> avg_cost <span class="kw">DESC</span>;</div></div>
+  </div></div>
+
+  <div class="full sql-card" data-tags="window cleaning"><div class="card">
+    <div class="card-head"><div><div class="card-title">Duplicate removal</div><div class="card-desc">Using ROW_NUMBER() to detect and remove exact duplicates</div></div>
+    <button class="btn-sm" onclick="copySQL(4)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button></div>
+    <div class="card-body"><div class="code-block" id="sql4"><span class="cmt">-- Remove duplicates keeping the first occurrence</span>
+<span class="kw">DELETE FROM</span> raw_treatment_costs
+<span class="kw">WHERE</span> record_id <span class="kw">IN</span> (
+    <span class="kw">SELECT</span> record_id <span class="kw">FROM</span> (
+        <span class="kw">SELECT</span> record_id,
+            <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+                <span class="kw">PARTITION BY</span> hospital_id, treatment_id, date_updated, cost
+                <span class="kw">ORDER BY</span> record_id
+            ) <span class="kw">AS</span> rn
+        <span class="kw">FROM</span> raw_treatment_costs
+    ) t
+    <span class="kw">WHERE</span> rn > <span class="num">1</span>
+);</div></div>
+  </div></div>
+
+  <div class="full sql-card" data-tags="cleaning"><div class="card">
+    <div class="card-head"><div><div class="card-title">Cost range validation</div><div class="card-desc">Flag and quarantine out-of-range cost records</div></div>
+    <button class="btn-sm" onclick="copySQL(5)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button></div>
+    <div class="card-body"><div class="code-block" id="sql5"><span class="cmt">-- Validate and flag each record</span>
+<span class="kw">SELECT</span>
+    record_id, hospital_name, treatment_name, cost,
+    <span class="kw">CASE</span>
+        <span class="kw">WHEN</span> cost <span class="kw">IS NULL</span>        <span class="kw">THEN</span> <span class="str">'MISSING_COST'</span>
+        <span class="kw">WHEN</span> cost &lt;= <span class="num">0</span>          <span class="kw">THEN</span> <span class="str">'INVALID_NEGATIVE'</span>
+        <span class="kw">WHEN</span> cost > <span class="num">5000000</span>    <span class="kw">THEN</span> <span class="str">'EXCEEDS_THRESHOLD'</span>
+        <span class="kw">ELSE</span>                        <span class="str">'VALID'</span>
+    <span class="kw">END</span> <span class="kw">AS</span> validation_flag
+<span class="kw">FROM</span> raw_treatment_costs
+<span class="kw">WHERE</span> cost <span class="kw">IS NULL</span> <span class="kw">OR</span> cost &lt;= <span class="num">0</span> <span class="kw">OR</span> cost > <span class="num">5000000</span>
+<span class="kw">ORDER BY</span> validation_flag, hospital_name;</div></div>
+  </div></div>
+</div>
+
+<!-- ═══ SCHEMA ═══ -->
+<div class="page" id="page-schema">
+  <div class="sec-head"><div class="sec-line"></div><div class="sec-title">Database Schema — MySQL 3NF</div><div class="sec-line"></div></div>
+  <div class="tags" id="schemaTags">
+    <span class="tag tag-dark">3NF Normalized</span>
+    <span class="tag tag-outline" data-filter="fk" onclick="filterSchema(this,'fk')">Foreign Keys</span>
+    <span class="tag tag-outline" data-filter="pk" onclick="filterSchema(this,'pk')">Primary Keys</span>
+    <span class="tag tag-outline" data-filter="idx" onclick="filterSchema(this,'idx')">Indexed FK columns</span>
+    <span class="tag tag-outline">InnoDB</span>
+  </div>
+
+  <div class="schema-wrap">
+    <div class="schema-block">
+      <div class="schema-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg> hospitals</div>
+      <div class="schema-row" data-schema="pk idx"><span class="schema-col">hospital_id</span><span class="schema-pk schema-type">PK · VARCHAR(10)</span></div>
+      <div class="schema-row"><span class="schema-col">hospital_name</span><span class="schema-type">VARCHAR(100)</span></div>
+      <div class="schema-row"><span class="schema-col">city</span><span class="schema-type">VARCHAR(50)</span></div>
+      <div class="schema-row"><span class="schema-col">state</span><span class="schema-type">VARCHAR(50)</span></div>
+      <div class="schema-row"><span class="schema-col">created_at</span><span class="schema-type">TIMESTAMP</span></div>
+    </div>
+    <div class="schema-block">
+      <div class="schema-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> treatments</div>
+      <div class="schema-row" data-schema="pk idx"><span class="schema-col">treatment_id</span><span class="schema-pk schema-type">PK · VARCHAR(10)</span></div>
+      <div class="schema-row"><span class="schema-col">treatment_name</span><span class="schema-type">VARCHAR(150)</span></div>
+      <div class="schema-row"><span class="schema-col">treatment_category</span><span class="schema-type">VARCHAR(80)</span></div>
+      <div class="schema-row"><span class="schema-col">description</span><span class="schema-type">TEXT</span></div>
+      <div class="schema-row"><span class="schema-col">created_at</span><span class="schema-type">TIMESTAMP</span></div>
+    </div>
+    <div class="schema-block">
+      <div class="schema-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> treatment_costs <span style="font-size:9px;opacity:0.6;margin-left:4px;">FACT</span></div>
+      <div class="schema-row" data-schema="pk"><span class="schema-col">record_id</span><span class="schema-pk schema-type">PK · VARCHAR(10)</span></div>
+      <div class="schema-row" data-schema="fk idx"><span class="schema-col">hospital_id</span><span class="schema-fk schema-type">FK → hospitals</span></div>
+      <div class="schema-row" data-schema="fk idx"><span class="schema-col">treatment_id</span><span class="schema-fk schema-type">FK → treatments</span></div>
+      <div class="schema-row"><span class="schema-col">cost</span><span class="schema-type">DECIMAL(12,2)</span></div>
+      <div class="schema-row"><span class="schema-col">currency</span><span class="schema-type">CHAR(3)</span></div>
+      <div class="schema-row"><span class="schema-col">date_updated</span><span class="schema-type">DATE</span></div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;"></div>
+  <div class="full"><div class="card">
+    <div class="card-head"><div><div class="card-title">DDL — Create tables</div></div>
+    <button class="btn-sm" onclick="copySQL(6)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button></div>
+    <div class="card-body"><div class="code-block" id="sql6"><span class="kw">CREATE TABLE</span> hospitals (
+    hospital_id     <span class="fn">VARCHAR</span>(<span class="num">10</span>)   <span class="kw">PRIMARY KEY</span>,
+    hospital_name   <span class="fn">VARCHAR</span>(<span class="num">100</span>)  <span class="kw">NOT NULL UNIQUE</span>,
+    city            <span class="fn">VARCHAR</span>(<span class="num">50</span>)   <span class="kw">NOT NULL</span>,
+    state           <span class="fn">VARCHAR</span>(<span class="num">50</span>)   <span class="kw">NOT NULL</span>,
+    created_at      <span class="fn">TIMESTAMP</span>      <span class="kw">DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span>
+) ENGINE=InnoDB;
+
+<span class="kw">CREATE TABLE</span> treatments (
+    treatment_id        <span class="fn">VARCHAR</span>(<span class="num">10</span>)   <span class="kw">PRIMARY KEY</span>,
+    treatment_name      <span class="fn">VARCHAR</span>(<span class="num">150</span>)  <span class="kw">NOT NULL UNIQUE</span>,
+    treatment_category  <span class="fn">VARCHAR</span>(<span class="num">80</span>)   <span class="kw">NOT NULL</span>,
+    created_at          <span class="fn">TIMESTAMP</span>      <span class="kw">DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span>
+) ENGINE=InnoDB;
+
+<span class="kw">CREATE TABLE</span> treatment_costs (
+    record_id      <span class="fn">VARCHAR</span>(<span class="num">10</span>)    <span class="kw">PRIMARY KEY</span>,
+    hospital_id    <span class="fn">VARCHAR</span>(<span class="num">10</span>)    <span class="kw">NOT NULL</span>,
+    treatment_id   <span class="fn">VARCHAR</span>(<span class="num">10</span>)    <span class="kw">NOT NULL</span>,
+    cost           <span class="fn">DECIMAL</span>(<span class="num">12</span>,<span class="num">2</span>) <span class="kw">NOT NULL</span>,
+    currency       <span class="fn">CHAR</span>(<span class="num">3</span>)        <span class="kw">DEFAULT</span> <span class="str">'INR'</span>,
+    date_updated   <span class="fn">DATE</span>            <span class="kw">NOT NULL</span>,
+    <span class="kw">FOREIGN KEY</span> (hospital_id)  <span class="kw">REFERENCES</span> hospitals(hospital_id),
+    <span class="kw">FOREIGN KEY</span> (treatment_id) <span class="kw">REFERENCES</span> treatments(treatment_id),
+    <span class="kw">INDEX</span> idx_hospital  (hospital_id),
+    <span class="kw">INDEX</span> idx_treatment (treatment_id),
+    <span class="kw">INDEX</span> idx_cost      (cost)
+) ENGINE=InnoDB;</div></div>
+  </div></div>
+</div>
+
+<!-- ═══ INSIGHTS ═══ -->
+<div class="page" id="page-insights">
+  <div class="sec-head"><div class="sec-line"></div><div class="sec-title">12 Key Findings</div><div class="sec-line"></div></div>
+  <div class="insights-list">
+    <div class="insight"><div class="insight-idx">01</div><div class="insight-heading">Mumbai has the highest healthcare costs</div><div class="insight-text">Mumbai's average of <em>₹2,67,020</em> is <em>45.9%</em> higher than Pune (₹1,82,969), driven by premium hospital positioning and higher operational costs.</div></div>
+    <div class="insight"><div class="insight-idx">02</div><div class="insight-heading">Heart transplant shows 85% price variation</div><div class="insight-text">Heart Transplant ranges from <em>₹14.4L to ₹26.6L</em> — an 85% variance. Patients comparing hospitals can save over <em>₹12 lakh</em> on one procedure.</div></div>
+    <div class="insight"><div class="insight-idx">03</div><div class="insight-heading">Ruby Hall Clinic is India's most affordable</div><div class="insight-text">Ruby Hall Clinic (Pune) offers the lowest average at <em>₹1,82,969</em>. Kokilaben Dhirubhai in Mumbai costs <em>63.6% more</em> for comparable procedures.</div></div>
+    <div class="insight"><div class="insight-idx">04</div><div class="insight-heading">Transplants cost 447× more than diagnostics</div><div class="insight-text">Transplant category averages <em>₹14.3L</em> vs Diagnostics at ₹14,455 — a 447× gap. Insurance stratified by category is critical for patient financial planning.</div></div>
+    <div class="insight"><div class="insight-idx">05</div><div class="insight-heading">Narayana Health leads on cardiac affordability</div><div class="insight-text">Narayana Health's high-volume model delivers cardiac procedures <em>30–40% below</em> Mumbai equivalents, demonstrating that scale can democratize access to life-saving care.</div></div>
+    <div class="insight"><div class="insight-idx">06</div><div class="insight-heading">₹86.48L aggregate savings opportunity</div><div class="insight-text">If every patient chose the cheapest hospital, total savings would reach <em>₹86.48 lakh</em>, quantifying the cost of opaque pricing in Indian healthcare.</div></div>
+    <div class="insight"><div class="insight-idx">07</div><div class="insight-heading">Liver transplant has highest variance at 105%</div><div class="insight-text">Prices range from <em>₹10.07L to ₹20.66L</em> — a 105.2% spread. This is the single treatment where cost comparison tools add the most patient value.</div></div>
+    <div class="insight"><div class="insight-idx">08</div><div class="insight-heading">CMC Vellore offers non-profit pricing</div><div class="insight-text">Christian Medical College averages <em>₹2,50,156</em> despite globally recognised tertiary care quality. Its city discount factor of <em>0.85</em> reflects a non-profit mandate.</div></div>
+    <div class="insight"><div class="insight-idx">09</div><div class="insight-heading">57 duplicates — 4.5% data integrity risk</div><div class="insight-text">Raw data had 57 duplicates, 12 nulls, and 6 invalid values. After cleaning, quality improved from ~81% to <em>94%</em>, significantly improving KPI accuracy.</div></div>
+    <div class="insight"><div class="insight-idx">10</div><div class="insight-heading">ECG at ₹432 vs Heart Transplant at ₹26.65L</div><div class="insight-text">A <em>6,168×</em> cost range across treatments. Broad availability of affordable diagnostics can enable early detection, preventing far costlier interventions later.</div></div>
+    <div class="insight"><div class="insight-idx">11</div><div class="insight-heading">Medanta Gurgaon defies its premium location</div><div class="insight-text">Despite Gurgaon's premium reputation, Medanta averages just <em>₹1,99,105</em> — second lowest overall. High operational volume appears to offset city-level pricing pressure.</div></div>
+    <div class="insight"><div class="insight-idx">12</div><div class="insight-heading">Oncology costs exceed cardiac by 50%</div><div class="insight-text">Oncology averages <em>₹4,40,180</em> vs Cardiac at ₹2,92,260. Multi-session protocols and drug costs make oncology the category where cost guidance matters most.</div></div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ═══ DATA ═══════════════════════════════════════════════
+const hospitals = [
+  {name:"Ruby Hall Clinic",        city:"Pune",      state:"Maharashtra", avg:182969},
+  {name:"Medanta The Medicity",    city:"Gurgaon",   state:"Haryana",     avg:199105},
+  {name:"Narayana Health",         city:"Bangalore", state:"Karnataka",   avg:206235},
+  {name:"Apollo Hospitals",        city:"Mumbai",    state:"Maharashtra", avg:226897},
+  {name:"Fortis Healthcare",       city:"Delhi",     state:"Delhi",       avg:227088},
+  {name:"Yashoda Hospitals",       city:"Hyderabad", state:"Telangana",   avg:233106},
+  {name:"Sankara Nethralaya",      city:"Chennai",   state:"Tamil Nadu",  avg:237082},
+  {name:"Aster CMI Hospital",      city:"Bangalore", state:"Karnataka",   avg:243196},
+  {name:"Max Super Speciality",    city:"Delhi",     state:"Delhi",       avg:245654},
+  {name:"Christian Medical College",city:"Vellore",  state:"Tamil Nadu",  avg:250156},
+  {name:"Manipal Hospitals",       city:"Bangalore", state:"Karnataka",   avg:255146},
+  {name:"KIMS Hospitals",          city:"Hyderabad", state:"Telangana",   avg:263415},
+  {name:"Global Hospitals",        city:"Mumbai",    state:"Maharashtra", avg:273049},
+  {name:"AIIMS Delhi",             city:"Delhi",     state:"Delhi",       avg:287968},
+  {name:"Kokilaben Dhirubhai",     city:"Mumbai",    state:"Maharashtra", avg:299372}
+];
+
+const treatments = [
+  {id:"T001",name:"Coronary Artery Bypass",     cat:"Cardiac Surgery",   avg:405000, min:293598,  max:539184},
+  {id:"T002",name:"Angioplasty with Stenting",  cat:"Cardiac Surgery",   avg:188000, min:121000,  max:268000},
+  {id:"T003",name:"Knee Replacement",            cat:"Orthopaedics",      avg:318000, min:229163,  max:466681},
+  {id:"T004",name:"Hip Replacement",             cat:"Orthopaedics",      avg:354000, min:268228,  max:488453},
+  {id:"T005",name:"Spinal Fusion Surgery",       cat:"Orthopaedics",      avg:390000, min:281450,  max:523908},
+  {id:"T006",name:"Cataract Surgery",            cat:"Ophthalmology",     avg:36000,  min:18500,   max:61000},
+  {id:"T007",name:"LASIK Eye Surgery",           cat:"Ophthalmology",     avg:64000,  min:35000,   max:96000},
+  {id:"T008",name:"Appendectomy",                cat:"General Surgery",   avg:67000,  min:40000,   max:103000},
+  {id:"T009",name:"Cholecystectomy",             cat:"General Surgery",   avg:92000,  min:55000,   max:142000},
+  {id:"T010",name:"Laparoscopic Hernia Repair",  cat:"General Surgery",   avg:104000, min:60000,   max:155000},
+  {id:"T011",name:"MRI Brain Scan",              cat:"Diagnostics",       avg:15000,  min:8000,    max:24000},
+  {id:"T012",name:"CT Scan Chest",               cat:"Diagnostics",       avg:10000,  min:5000,    max:17000},
+  {id:"T013",name:"PET CT Scan",                 cat:"Diagnostics",       avg:38000,  min:22000,   max:60000},
+  {id:"T014",name:"Chemotherapy Session",         cat:"Oncology",          avg:75000,  min:35000,   max:135000},
+  {id:"T015",name:"Radiation Therapy",            cat:"Oncology",          avg:160000, min:80000,   max:276000},
+  {id:"T016",name:"Bone Marrow Transplant",      cat:"Oncology",          avg:950000, min:725129,  max:1441933},
+  {id:"T017",name:"Liver Transplant",             cat:"Transplant",        avg:1480000,min:1007090, max:2066150},
+  {id:"T018",name:"Kidney Transplant",            cat:"Transplant",        avg:910000, min:686982,  max:1149282},
+  {id:"T019",name:"Heart Transplant",             cat:"Transplant",        avg:1900000,min:1436931, max:2664547},
+  {id:"T020",name:"Normal Delivery",              cat:"Maternity",         avg:52000,  min:25000,   max:88000},
+  {id:"T021",name:"Caesarean Section",            cat:"Maternity",         avg:108000, min:55000,   max:165000},
+  {id:"T022",name:"IVF Treatment",                cat:"Maternity",         avg:195000, min:120000,  max:308000},
+  {id:"T023",name:"Dialysis Session",             cat:"Nephrology",        avg:6500,   min:3500,    max:10500},
+  {id:"T024",name:"Kidney Stone Removal",         cat:"Nephrology",        avg:90000,  min:50000,   max:143000},
+  {id:"T025",name:"Neurosurgery Brain Tumour",    cat:"Neurology",         avg:648000, min:491982,  max:836701},
+  {id:"T026",name:"Epilepsy Surgery",             cat:"Neurology",         avg:536000, min:380460,  max:717280},
+  {id:"T027",name:"Rhinoplasty",                  cat:"Plastic Surgery",   avg:158000, min:90000,   max:242000},
+  {id:"T028",name:"Liposuction",                  cat:"Plastic Surgery",   avg:144000, min:80000,   max:220000},
+  {id:"T029",name:"ECG",                          cat:"Diagnostics",       avg:1200,   min:432,     max:2200},
+  {id:"T030",name:"Blood Panel Complete",         cat:"Diagnostics",       avg:3200,   min:1500,    max:5500},
+  {id:"T031",name:"Dental Implant",               cat:"Dental",            avg:78000,  min:40000,   max:132000},
+  {id:"T032",name:"Root Canal Treatment",         cat:"Dental",            avg:16500,  min:8000,    max:27500},
+  {id:"T033",name:"Wisdom Tooth Extraction",      cat:"Dental",            avg:11000,  min:5000,    max:20000},
+  {id:"T034",name:"Physiotherapy Session",        cat:"Rehabilitation",    avg:3000,   min:1500,    max:5000},
+  {id:"T035",name:"Pulmonary Function Test",      cat:"Pulmonology",       avg:5500,   min:3000,    max:9000},
+  {id:"T036",name:"Bronchoscopy",                 cat:"Pulmonology",       avg:27000,  min:15000,   max:44000},
+  {id:"T037",name:"Colonoscopy",                  cat:"Gastroenterology",  avg:23500,  min:12000,   max:38000},
+  {id:"T038",name:"Endoscopy Upper GI",           cat:"Gastroenterology",  avg:15000,  min:8000,    max:24000},
+  {id:"T039",name:"Liver Biopsy",                 cat:"Gastroenterology",  avg:38000,  min:20000,   max:60000},
+  {id:"T040",name:"Thyroid Surgery",              cat:"Endocrinology",     avg:145000, min:80000,   max:220000}
+];
+
+const categories = [
+  {cat:"Transplant",      avg:1430790, color:"#DC2626"},
+  {cat:"Neurology",       avg:593535,  color:"#EA580C"},
+  {cat:"Oncology",        avg:440180,  color:"#CA8A04"},
+  {cat:"Orthopaedics",    avg:326014,  color:"#65A30D"},
+  {cat:"Cardiac Surgery", avg:292260,  color:"#0891B2"},
+  {cat:"Plastic Surgery", avg:160135,  color:"#7C3AED"},
+  {cat:"Endocrinology",   avg:156408,  color:"#DB2777"},
+  {cat:"Maternity",       avg:120364,  color:"#16A34A"},
+  {cat:"Other",           avg:50000,   color:"#71717A"}
+];
+
+const cities = [
+  {city:"Mumbai",    state:"Maharashtra", avg:267020, min:432,    max:2664547, hosp:3, rec:280},
+  {city:"Delhi",     state:"Delhi",       avg:254658, min:500,    max:2125827, hosp:3, rec:252},
+  {city:"Vellore",   state:"Tamil Nadu",  avg:250156, min:550,    max:1900000, hosp:1, rec:84},
+  {city:"Hyderabad", state:"Telangana",   avg:248888, min:470,    max:1540126, hosp:2, rec:168},
+  {city:"Chennai",   state:"Tamil Nadu",  avg:237082, min:490,    max:1450000, hosp:1, rec:84},
+  {city:"Bangalore", state:"Karnataka",   avg:234966, min:445,    max:1800000, hosp:3, rec:259},
+  {city:"Gurgaon",   state:"Haryana",     avg:199105, min:432,    max:1600000, hosp:1, rec:72},
+  {city:"Pune",      state:"Maharashtra", avg:182969, min:432,    max:1420000, hosp:1, rec:84}
+];
+
+const cheapVsExp = [
+  {t:"Heart Transplant",         cat:"Transplant",      cheap:"Narayana Health",          exp:"Kokilaben Dhirubhai",   save:1200000},
+  {t:"Liver Transplant",         cat:"Transplant",      cheap:"Christian Medical College", exp:"Apollo Hospitals",      save:1059060},
+  {t:"Bone Marrow Transplant",   cat:"Oncology",        cheap:"Yashoda Hospitals",         exp:"Global Hospitals",      save:716804},
+  {t:"Kidney Transplant",        cat:"Transplant",      cheap:"Narayana Health",           exp:"AIIMS Delhi",           save:462300},
+  {t:"Neurosurgery Brain Tumour",cat:"Neurology",       cheap:"Ruby Hall Clinic",          exp:"Kokilaben Dhirubhai",   save:344719},
+  {t:"Epilepsy Surgery",         cat:"Neurology",       cheap:"Narayana Health",           exp:"AIIMS Delhi",           save:336820},
+  {t:"Knee Replacement",         cat:"Orthopaedics",    cheap:"Fortis Healthcare",         exp:"AIIMS Delhi",           save:237518},
+  {t:"Coronary Artery Bypass",   cat:"Cardiac Surgery", cheap:"Narayana Health",           exp:"Kokilaben Dhirubhai",   save:245586}
+];
+
+const varData = [
+  {t:"Heart Transplant",       min:1436931, max:2664547, pct:85.4},
+  {t:"Liver Transplant",       min:1007090, max:2066150, pct:105.2},
+  {t:"Bone Marrow Transplant", min:725129,  max:1441933, pct:98.9},
+  {t:"Kidney Transplant",      min:686982,  max:1149282, pct:67.3},
+  {t:"Neurosurgery Brain",     min:491982,  max:836701,  pct:70.1},
+  {t:"Epilepsy Surgery",       min:380460,  max:717280,  pct:88.5},
+  {t:"Knee Replacement",       min:229163,  max:466681,  pct:103.6},
+  {t:"CABG",                   min:293598,  max:539184,  pct:83.6}
+];
+
+// ═══ HELPERS ═════════════════════════════════════════════
+function fmt(n) {
+  n = Math.round(n);
+  if (n >= 10000000) return '₹' + (n / 10000000).toFixed(2) + 'Cr';
+  if (n >= 100000)   return '₹' + (n / 100000).toFixed(1) + 'L';
+  if (n >= 1000)     return '₹' + (n / 1000).toFixed(1) + 'K';
+  return '₹' + n.toLocaleString('en-IN');
+}
+function fmtFull(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+function pillClass(v) { return v > 500000 ? 'pill-red' : v > 100000 ? 'pill-amber' : 'pill-green'; }
+function barColor(i, total) {
+  const ratio = i / (total - 1);
+  if (ratio < 0.35) return '#16A34A';
+  if (ratio < 0.7) return '#CA8A04';
+  return '#DC2626';
+}
+
+// ═══ NAVIGATION ══════════════════════════════════════════
+let _activePage = 'overview';
+function go(id, el) {
+  _activePage = id;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  render(id);
+}
+function render(id) {
+  switch (id) {
+    case 'overview': renderOverview(); break;
+    case 'hospitals': renderHospitals(); break;
+    case 'treatments': renderTreatments(); break;
+    case 'cities': renderCities(); break;
+    case 'compare': renderCompare(); break;
+  }
+}
+
+// ═══ OVERVIEW ════════════════════════════════════════════
+function renderOverview() {
+  const sorted = [...hospitals].sort((a, b) => a.avg - b.avg);
+  const maxA = Math.max(...hospitals.map(h => h.avg));
+  document.getElementById('overviewHospBar').innerHTML = sorted.slice(0, 10).map((h, i) => {
+    const pct = (h.avg / maxA * 100).toFixed(1);
+    return `<div class="hbar-row">
+      <span class="hbar-rank">${i + 1}</span>
+      <div class="hbar-name">${h.name}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${pct}%;background:${barColor(i, 10)}"><span class="hbar-fill-text">${fmt(h.avg)}</span></div></div>
+    </div>`;
+  }).join('');
+
+  // Donut
+  const total = categories.reduce((s, c) => s + c.avg, 0);
+  let angle = -90, r = 42, cx = 60, cy = 60;
+  let paths = '';
+  categories.forEach(c => {
+    const slice = (c.avg / total) * 360;
+    const r1 = angle * Math.PI / 180, r2 = (angle + slice) * Math.PI / 180;
+    const x1 = cx + r * Math.cos(r1), y1 = cy + r * Math.sin(r1);
+    const x2 = cx + r * Math.cos(r2), y2 = cy + r * Math.sin(r2);
+    const lg = slice > 180 ? 1 : 0;
+    paths += `<path d="M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${lg},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" fill="${c.color}" opacity="0.8"/>`;
+    angle += slice;
+  });
+  document.getElementById('overviewDonut').innerHTML = `<div class="donut-container">
+    <svg viewBox="0 0 120 120" width="140" height="140">
+      ${paths}
+      <circle cx="60" cy="60" r="27" fill="var(--surface)"/>
+      <text x="60" y="58" text-anchor="middle" font-size="8" fill="var(--text-3)" font-family="Inter" font-weight="500">Cost</text>
+      <text x="60" y="68" text-anchor="middle" font-size="8" fill="var(--text-3)" font-family="Inter" font-weight="500">Split</text>
+    </svg>
+    <div class="donut-legend">${categories.map(c => `<div class="legend-row"><div class="legend-swatch" style="background:${c.color}"></div><span class="legend-label">${c.cat}</span><span class="legend-value">${(c.avg / total * 100).toFixed(0)}%</span></div>`).join('')}</div>
+  </div>`;
+
+  // Histogram
+  const buckets = ['<10K', '10–50K', '50K–1L', '1–2L', '2–4L', '4L+'];
+  const counts = [0, 0, 0, 0, 0, 0];
+  treatments.forEach(t => {
+    if (t.avg < 10000) counts[0]++;
+    else if (t.avg < 50000) counts[1]++;
+    else if (t.avg < 100000) counts[2]++;
+    else if (t.avg < 200000) counts[3]++;
+    else if (t.avg < 400000) counts[4]++;
+    else counts[5]++;
+  });
+  const maxC = Math.max(...counts);
+  const hCols = ['#16A34A', '#16A34A', '#CA8A04', '#CA8A04', '#DC2626', '#DC2626'];
+  document.getElementById('overviewHist').innerHTML = `<div style="display:flex;align-items:flex-end;gap:10px;height:120px;padding:8px 0 0;">
+    ${counts.map((c, i) => {
+      const h = maxC ? Math.round(c / maxC * 85) : 0;
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="font-size:11px;font-weight:600;color:var(--text-2);">${c}</div>
+        <div style="width:100%;height:${h}px;background:${hCols[i]};border-radius:4px 4px 0 0;opacity:0.7;min-height:4px;transition:height 0.5s ease;"></div>
+        <div style="font-size:10px;color:var(--text-4);text-align:center;">${buckets[i]}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ═══ HOSPITALS ═══════════════════════════════════════════
+function renderHospitals() {
+  const aff = [...hospitals].sort((a, b) => a.avg - b.avg);
+  const exp = [...hospitals].sort((a, b) => b.avg - a.avg);
+  const maxA = Math.max(...hospitals.map(h => h.avg));
+
+  document.getElementById('tblAffordable').innerHTML = aff.map((h, i) => {
+    const rk = i < 3 ? `rank-${i + 1}` : 'rank-n';
+    return `<tr><td><span class="rank-dot ${rk}">${i + 1}</span></td><td style="font-weight:500;color:var(--text)">${h.name}</td><td style="color:var(--text-3)">${h.city}</td><td><span class="pill pill-green">${fmtFull(h.avg)}</span></td></tr>`;
+  }).join('');
+
+  document.getElementById('tblExpensive').innerHTML = exp.map((h, i) => {
+    const rk = i < 3 ? `rank-${i + 1}` : 'rank-n';
+    return `<tr><td><span class="rank-dot ${rk}">${i + 1}</span></td><td style="font-weight:500;color:var(--text)">${h.name}</td><td style="color:var(--text-3)">${h.city}</td><td><span class="pill ${pillClass(h.avg)}">${fmtFull(h.avg)}</span></td></tr>`;
+  }).join('');
+
+  document.getElementById('hospFullBar').innerHTML = aff.map((h, i) => {
+    const pct = (h.avg / maxA * 100).toFixed(1);
+    return `<div class="hbar-row">
+      <span class="hbar-rank">${i + 1}</span>
+      <div class="hbar-name">${h.name}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${pct}%;background:${barColor(i, 15)}"><span class="hbar-fill-text">${fmtFull(h.avg)}</span></div></div>
+      <div class="hbar-val">${h.city}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('tblCheapExp').innerHTML = cheapVsExp.map(r => `<tr>
+    <td style="font-weight:500;color:var(--text);">${r.t}</td>
+    <td><span class="cat-label">${r.cat}</span></td>
+    <td><span class="pill pill-green">${r.cheap}</span></td>
+    <td><span class="pill pill-red">${r.exp}</span></td>
+    <td style="font-family:var(--mono);color:var(--amber);font-weight:600;">${fmt(r.save)}</td>
+  </tr>`).join('');
+}
+
+// ═══ TREATMENTS ══════════════════════════════════════════
+function renderTreatments() {
+  const top10 = [...treatments].sort((a, b) => b.max - a.max).slice(0, 10);
+  const maxM = Math.max(...top10.map(t => t.max));
+  document.getElementById('expTreatBar').innerHTML = top10.map((t, i) => {
+    const pct = (t.max / maxM * 100).toFixed(1);
+    const nm = t.name.length > 24 ? t.name.substring(0, 24) + '…' : t.name;
+    return `<div class="hbar-row">
+      <span class="hbar-rank">${i + 1}</span>
+      <div class="hbar-name" title="${t.name}">${nm}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${pct}%;background:${barColor(i, 10)}"><span class="hbar-fill-text">${fmt(t.max)}</span></div></div>
+    </div>`;
+  }).join('');
+
+  const maxV = Math.max(...varData.map(v => v.max));
+  document.getElementById('varianceChart').innerHTML = varData.map(v => {
+    const minPct = (v.min / maxV * 100).toFixed(1);
+    const ranPct = ((v.max - v.min) / maxV * 100).toFixed(1);
+    return `<div class="var-item">
+      <div class="var-header"><span class="var-name">${v.t}</span><span class="var-pct">±${v.pct}%</span></div>
+      <div class="var-track"><div class="var-base" style="left:0;width:${minPct}%"></div><div class="var-spread" style="left:${minPct}%;width:${ranPct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  const sorted = [...treatments].sort((a, b) => b.avg - a.avg);
+  document.getElementById('tblTreatments').innerHTML = sorted.map((t, i) => {
+    const rk = i < 3 ? `rank-${i + 1}` : 'rank-n';
+    return `<tr>
+      <td><span class="rank-dot ${rk}">${i + 1}</span></td>
+      <td style="font-weight:500;color:var(--text);">${t.name}</td>
+      <td><span class="cat-label">${t.cat}</span></td>
+      <td><span class="pill ${pillClass(t.avg)}">${fmtFull(t.avg)}</span></td>
+      <td style="font-size:11px;color:var(--text-3);font-family:var(--mono);">${fmt(t.min)} – ${fmt(t.max)}</td>
+      <td style="color:var(--text-3);">15</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══ COMPARE ═════════════════════════════════════════════
+function initCompare() {
+  const opts = hospitals.map(h => `<option value="${h.name}">${h.name} — ${h.city}</option>`).join('');
+  document.getElementById('cmpA').innerHTML = '<option value="">Select hospital...</option>' + opts;
+  document.getElementById('cmpB').innerHTML = '<option value="">Select hospital...</option>' + opts;
+}
+function renderCompare() {
+  const a = document.getElementById('cmpA').value;
+  const b = document.getElementById('cmpB').value;
+  const el = document.getElementById('compareResult');
+  if (!a || !b) { el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-4);">Select two hospitals above to compare their costs side by side.</div>'; return; }
+  if (a === b) { el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-4);">Please select two different hospitals.</div>'; return; }
+  const hA = hospitals.find(h => h.name === a);
+  const hB = hospitals.find(h => h.name === b);
+  const diff = ((hB.avg - hA.avg) / hA.avg * 100).toFixed(1);
+  const cheaper = hA.avg <= hB.avg ? hA : hB;
+  const costlier = hA.avg <= hB.avg ? hB : hA;
+
+  el.innerHTML = `
+    <div class="grid-2" style="margin-bottom:20px;">
+      <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">${hA.name}</div>
+        <div style="font-size:11px;color:var(--text-4);margin-bottom:10px;">${hA.city}, ${hA.state}</div>
+        <div style="font-size:28px;font-weight:700;font-family:var(--mono);color:var(--text);">${fmtFull(hA.avg)}</div>
+        <div style="font-size:11px;color:var(--text-4);margin-top:4px;">average cost per treatment</div>
+      </div></div>
+      <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">${hB.name}</div>
+        <div style="font-size:11px;color:var(--text-4);margin-bottom:10px;">${hB.city}, ${hB.state}</div>
+        <div style="font-size:28px;font-weight:700;font-family:var(--mono);color:var(--text);">${fmtFull(hB.avg)}</div>
+        <div style="font-size:11px;color:var(--text-4);margin-top:4px;">average cost per treatment</div>
+      </div></div>
+    </div>
+    <div class="card"><div class="card-body">
+      <div style="display:flex;align-items:center;justify-content:center;gap:20px;padding:14px 0;">
+        <div style="text-align:center;">
+          <div style="font-size:11px;color:var(--text-4);margin-bottom:4px;">Cost Difference</div>
+          <div style="font-size:24px;font-weight:700;font-family:var(--mono);color:${diff > 0 ? 'var(--red)' : 'var(--green)'};">${diff > 0 ? '+' : ''}${diff}%</div>
+        </div>
+        <div style="width:1px;height:40px;background:var(--border);"></div>
+        <div style="text-align:center;">
+          <div style="font-size:11px;color:var(--text-4);margin-bottom:4px;">Absolute Difference</div>
+          <div style="font-size:24px;font-weight:700;font-family:var(--mono);color:var(--text);">${fmtFull(Math.abs(hA.avg - hB.avg))}</div>
+        </div>
+        <div style="width:1px;height:40px;background:var(--border);"></div>
+        <div style="text-align:center;">
+          <div style="font-size:11px;color:var(--text-4);margin-bottom:4px;">More Affordable</div>
+          <div style="font-size:14px;font-weight:600;color:var(--green);">${cheaper.name}</div>
+        </div>
+      </div>
+    </div></div>`;
+}
+
+// ═══ CITIES ══════════════════════════════════════════════
+function renderCities() {
+  const maxC = Math.max(...cities.map(c => c.avg));
+  document.getElementById('cityGrid').innerHTML = cities.map((c, i) => {
+    const col = barColor(i, cities.length);
+    return `<div class="city-tile">
+      <div class="city-tile-name">${c.city}</div>
+      <div class="city-tile-state">${c.state}</div>
+      <div class="city-tile-cost" style="color:${col}">${fmt(c.avg)}</div>
+      <div class="city-tile-bar" style="width:${(c.avg / maxC * 100).toFixed(0)}%;background:${col};"></div>
+      <div class="city-tile-meta"><span><strong>${c.hosp}</strong> hospitals</span><span><strong>${c.rec}</strong> records</span></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('cityBarChart').innerHTML = cities.map((c, i) => {
+    const pct = (c.avg / maxC * 100).toFixed(1);
+    return `<div class="hbar-row">
+      <span class="hbar-rank">${i + 1}</span>
+      <div class="hbar-name">${c.city}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${pct}%;background:${barColor(i, cities.length)}"><span class="hbar-fill-text">${fmtFull(c.avg)}</span></div></div>
+      <div class="hbar-val">${c.state}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('tblCity').innerHTML = cities.map((c, i) => {
+    const rk = i < 3 ? `rank-${i + 1}` : 'rank-n';
+    return `<tr>
+      <td><span class="rank-dot ${rk}">${i + 1}</span></td>
+      <td style="font-weight:500;color:var(--text);">${c.city}</td>
+      <td style="color:var(--text-3);">${c.state}</td>
+      <td><span class="pill ${pillClass(c.avg)}">${fmtFull(c.avg)}</span></td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--green);">${fmtFull(c.min)}</td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--red);">${fmtFull(c.max)}</td>
+      <td style="color:var(--text-3);">${c.hosp}</td>
+      <td style="color:var(--text-3);">${c.rec}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══ FILTERS ═════════════════════════════════════════════
+function applyFilters() { render(_activePage); }
+function resetFilters() {
+  ['fHosp', 'fCity', 'fCat'].forEach(id => document.getElementById(id).value = '');
+  render(_activePage);
+  showToast('Filters cleared');
+}
+
+// ═══ DARK MODE ═══════════════════════════════════════════
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  const btn = document.getElementById('themeToggle');
+  btn.innerHTML = isDark
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
+  showToast(isDark ? 'Light mode' : 'Dark mode');
+}
+
+// ═══ SEARCH ══════════════════════════════════════════════
+function openSearch() { document.getElementById('searchModal').classList.add('open'); setTimeout(() => document.getElementById('searchInput').focus(), 100); }
+function closeSearch() { document.getElementById('searchModal').classList.remove('open'); document.getElementById('searchInput').value = ''; document.getElementById('searchResults').innerHTML = ''; }
+function handleSearch(q) {
+  q = q.toLowerCase().trim();
+  if (!q) { document.getElementById('searchResults').innerHTML = ''; return; }
+  const results = [];
+  treatments.forEach(t => {
+    if (t.name.toLowerCase().includes(q) || t.cat.toLowerCase().includes(q))
+      results.push({ name: t.name, meta: t.cat, cost: fmtFull(t.avg), type: 'treatment' });
+  });
+  hospitals.forEach(h => {
+    if (h.name.toLowerCase().includes(q) || h.city.toLowerCase().includes(q))
+      results.push({ name: h.name, meta: h.city, cost: fmtFull(h.avg), type: 'hospital' });
+  });
+  document.getElementById('searchResults').innerHTML = results.length
+    ? results.slice(0, 12).map(r => `<div class="search-result-item" onclick="jumpTo('${r.type}');closeSearch();"><div><div class="sr-name">${r.name}</div><div class="sr-meta">${r.meta} · ${r.type}</div></div><div class="sr-cost">${r.cost}</div></div>`).join('')
+    : '<div style="text-align:center;padding:20px;color:var(--text-4);font-size:13px;">No results found</div>';
+}
+function jumpTo(type) {
+  const tab = type === 'treatment' ? 'treatments' : 'hospitals';
+  const navItem = document.querySelectorAll('.nav-item');
+  navItem.forEach(n => { if (n.textContent.trim().toLowerCase().startsWith(tab)) go(tab, n); });
+}
+
+// ═══ EXPORT ══════════════════════════════════════════════
+function exportData() {
+  let csv = 'Hospital,City,State,Avg Cost\n';
+  hospitals.forEach(h => csv += `"${h.name}","${h.city}","${h.state}",${h.avg}\n`);
+  csv += '\nTreatment,Category,Avg Cost,Min Cost,Max Cost\n';
+  treatments.forEach(t => csv += `"${t.name}","${t.cat}",${t.avg},${t.min},${t.max}\n`);
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'medibridge_data.csv'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV exported successfully');
+}
+
+// ═══ COPY SQL ════════════════════════════════════════════
+function copySQL(idx) {
+  const el = document.getElementById('sql' + idx);
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('SQL copied to clipboard'));
+}
+
+// ═══ TOAST ═══════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ═══ SQL TAG FILTER ══════════════════════════════════════
+let _activeSqlFilter = null;
+function filterSQL(el, tag) {
+  const cards = document.querySelectorAll('.sql-card');
+  const tags = document.querySelectorAll('#sqlTags .tag-outline');
+
+  // Toggle off if same tag clicked again
+  if (_activeSqlFilter === tag) {
+    _activeSqlFilter = null;
+    tags.forEach(t => t.classList.remove('active'));
+    cards.forEach(c => c.classList.remove('sql-card-hidden'));
+    showToast('Showing all SQL queries');
+    return;
+  }
+
+  _activeSqlFilter = tag;
+  tags.forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+
+  let visibleCount = 0;
+  cards.forEach(c => {
+    const cardTags = (c.getAttribute('data-tags') || '').split(' ');
+    if (cardTags.includes(tag)) {
+      c.classList.remove('sql-card-hidden');
+      visibleCount++;
+    } else {
+      c.classList.add('sql-card-hidden');
+    }
+  });
+  showToast(`Filtered: ${visibleCount} ${visibleCount === 1 ? 'query' : 'queries'} shown`);
+}
+
+// ═══ SCHEMA TAG FILTER ═══════════════════════════════════
+let _activeSchemaFilter = null;
+function filterSchema(el, tag) {
+  const rows = document.querySelectorAll('.schema-row');
+  const tags = document.querySelectorAll('#schemaTags .tag-outline');
+
+  // Toggle off if same tag clicked again
+  if (_activeSchemaFilter === tag) {
+    _activeSchemaFilter = null;
+    tags.forEach(t => t.classList.remove('active'));
+    rows.forEach(r => { r.classList.remove('highlight', 'dimmed'); });
+    showToast('Showing all schema fields');
+    return;
+  }
+
+  _activeSchemaFilter = tag;
+  tags.forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+
+  let highlightCount = 0;
+  rows.forEach(r => {
+    const rowTags = (r.getAttribute('data-schema') || '').split(' ');
+    if (rowTags.includes(tag)) {
+      r.classList.add('highlight');
+      r.classList.remove('dimmed');
+      highlightCount++;
+    } else {
+      r.classList.remove('highlight');
+      r.classList.add('dimmed');
+    }
+  });
+  showToast(`Highlighted: ${highlightCount} ${highlightCount === 1 ? 'field' : 'fields'}`);
+}
+
+// ═══ CLOCK ═══════════════════════════════════════════════
+function updateClock() {
+  const now = new Date();
+  document.getElementById('liveClock').textContent = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
+// ═══ KEYBOARD SHORTCUTS ═════════════════════════════════
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+  if (e.key === 'Escape') closeSearch();
+});
+
+// ═══ INIT ════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  // Restore theme
+  if (localStorage.getItem('theme') === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('themeToggle').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
+  renderOverview();
+  initCompare();
+});
+</script>
+</body>
+</html>
